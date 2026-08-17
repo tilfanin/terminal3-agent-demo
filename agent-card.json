@@ -1,0 +1,18 @@
+{
+  "type": "https://eips.ethereum.org/EIPS/eip-8004#registration-v1",
+  "name": "Terminal3 Sandbox Demo Agent",
+  "description": "Zero-capital T3N agent session: authenticated against the sandbox via @terminal3/t3n-sdk (v4.40.0), claimed 20,000 test credits, resolved DID did:t3n:9e7cded3072a04fafbb792559b6b8ebdc2bc98cd, and documented reproducible SDK bugs (incl. attestation-endpoint reliability).",
+  "services": [
+    {
+      "name": "DID",
+      "endpoint": "did:t3n:9e7cded3072a04fafbb792559b6b8ebdc2bc98cd",
+      "version": "v1"
+    }
+  ],
+  "x402Support": false,
+  "active": true,
+  "registrations": [],
+  "supportedTrust": [
+    "tee-attestation"
+  ]
+}
