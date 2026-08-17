@@ -1,0 +1,50 @@
+/// XAgent Deals WIT world — deal/escrow lifecycle in the T3N TEE.
+///
+/// Imports required host capabilities:
+///   - tenant-context: tenant DID, used to build the full `z:<tid>:<map>` KV names
+///   - logging:        debug / info / error lines
+///   - kv-store:       the `deals` map — deal state keyed by deal id
+///
+/// Like the reference guarded-commerce demo, this contract deliberately does not
+/// import `signing` or `outbox` (not linked into tenant worlds yet). All state is
+/// durable in the host KV store; no outbound HTTP needed for the core lifecycle.
+package z:xagent-deals@0.1.0;
+
+world xagent-deals {
+    import host:tenant/tenant-context@1.0.0;
+    import host:interfaces/logging@2.1.0;
+    import host:interfaces/kv-store@2.1.0;
+
+    export contracts;
+}
+
+interface contracts {
+    /// Standard 3-field envelope used by all contracts callable from the node.
+    record generic-input {
+        input:        option<list<u8>>,
+        user-profile: option<list<u8>>,
+        context:      option<list<u8>>,
+    }
+
+    /// Propose a deal: { counterparty, token, amount, description_hash }.
+    /// Creates a deal record in state `created`.
+    propose-deal: func(req: generic-input) -> result<list<u8>, string>;
+
+    /// Accept a deal: { deal_id }. State `created` -> `accepted`.
+    accept-deal: func(req: generic-input) -> result<list<u8>, string>;
+
+    /// Fulfill a deal: { deal_id }. State `accepted` -> `fulfilled`.
+    fulfill-deal: func(req: generic-input) -> result<list<u8>, string>;
+
+    /// Dispute a deal: { deal_id, reason }. State `accepted`/`created` -> `disputed`.
+    dispute-deal: func(req: generic-input) -> result<list<u8>, string>;
+
+    /// Cancel a deal: { deal_id }. State `created` -> `cancelled`.
+    cancel-deal: func(req: generic-input) -> result<list<u8>, string>;
+
+    /// Read a deal: { deal_id }. Returns the full deal record.
+    get-deal: func(req: generic-input) -> result<list<u8>, string>;
+
+    /// Scan all deals. Returns a JSON array of deal records.
+    list-deals: func(req: generic-input) -> result<list<u8>, string>;
+}
