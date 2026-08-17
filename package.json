@@ -1,0 +1,14 @@
+{
+  "name": "terminal3-agent-demo",
+  "version": "1.0.0",
+  "description": "Terminal3 T3N Agent Developer Kit — Quickstart + Walkthrough completion with bug report (Superteam bounty submission)",
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js"
+  },
+  "dependencies": {
+    "@terminal3/t3n-sdk": "^4.40.0",
+    "dotenv": "^16.4.5"
+  }
+}
