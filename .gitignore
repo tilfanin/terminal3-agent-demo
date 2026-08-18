@@ -1,2 +1,6 @@
 node_modules/
 .env
+*.log
+api-upload.ps1
+push-retry.ps1
+deploy-retry.*.log
