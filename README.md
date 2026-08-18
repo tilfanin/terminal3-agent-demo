@@ -33,17 +33,35 @@ Connection: OK (sandbox)
 4. **Agent ID** — the key itself encodes the agent identity (DID)
 
 ## Bugs / observations
-- **Attestation quote fetch can stall mid-stream**:
-  `fetchTrustedManifest("sandbox")` succeeds (trust-manifest is 518 B) but the ML-KEM
-  handshake then fetches the ~37 KB TDX attestation quote, which can download at ~330 B/s
-  and get killed mid-stream (`TypeError: terminated` / `ECONNRESET`) on some networks. All
-  other endpoints (`GET /status`, `POST /api/rpc`, `POST /api/invoke`) work fine.
-  - **Workaround**: `trustAnchor: { unsafe_trust_server: true }` skips the attestation
-    fetch entirely → handshake + authenticate + getUsage complete. Safe for sandbox test
-    credits only (never for production nodes with real funds).
-  - **Alternative**: stateless `invoke()` — single `POST /api/invoke` with an
-    `X-T3N-Api-Key` header, no handshake/session/attestation required.
-- (fill in during execution: any further errors hit, e.g. `tenant.me()` throwing at "Set Up Dev Environment", with reproduction steps and workarounds)
+See [`BUGS.md`](BUGS.md) for the full report (9 items: 3 verified bugs with
+reproduction steps + 6 contract-development findings). Summary:
+
+- **`agent card`/`set-card` rejected by the sandbox**: `missing field script_name` —
+  the SDK's card code path never sends a field the sandbox validator requires.
+- **Attestation endpoint stalls mid-stream** on some networks (~37 KB quote killed at
+  ~330 B/s): `trustAnchor: { unsafe_trust_server: true }` skips it (sandbox-only), or
+  use stateless `invoke()` with an `X-T3N-Api-Key` header — no handshake required.
+- **`tenant.me()` missing** from the shipped SDK though the docs call it.
+
+## Contract (going beyond the quickstart)
+`contract/` is a Rust WASM contract for the Trinity TEE: **xagent-deals** — an
+on-chain deal/escrow lifecycle (propose → accept → fulfill / dispute / cancel) with
+all state durable in the host KV store. Builds clean to `wasm32-wasip2`:
+
+```bash
+cd contract
+rustup target add wasm32-wasip2
+cargo build --target wasm32-wasip2 --release
+# target/wasm32-wasip2/release/xagent_deals.wasm (178,719 bytes)
+```
+
+Deploy to the sandbox (script included, reproducible):
+
+```bash
+node src/deploy-contract.js
+# Authenticated as: did:t3n:...
+# Registered contract: { name, contract_id }
+```
 
 ## License
 MIT
