@@ -4,3 +4,7 @@ node_modules/
 api-upload.ps1
 push-retry.ps1
 deploy-retry.*.log
+watchdog-deploy.ps1
+deploy-cycle-*.log
+deploy-cycle-*.err.log
+deploy-success.json
