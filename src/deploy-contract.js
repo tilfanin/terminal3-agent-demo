@@ -1,7 +1,7 @@
 // Deploy the xagent-deals WASM contract to the T3N sandbox.
 // Usage: node src/deploy-contract.js  (requires T3N_API_KEY + T3N_UNSAFE_TRUST=1 in .env)
 // Reproduces the exact register() call from the docs walkthrough.
-import { readFile } from "fs/promises";
+import { readFile, writeFile } from "fs/promises";
 import {
   T3nClient,
   TenantClient,
@@ -74,3 +74,12 @@ for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
 }
 
 console.log("Registered contract:", JSON.stringify(result, null, 2));
+
+// Success marker for the watchdog (watchdog-deploy.ps1). UTF-8 file, independent
+// of any log encoding mangling from PowerShell redirection.
+await writeFile(
+  "./deploy-success.json",
+  JSON.stringify({ contract: result, at: new Date().toISOString() }, null, 2),
+  "utf8",
+);
+console.log("Success marker written: deploy-success.json");
